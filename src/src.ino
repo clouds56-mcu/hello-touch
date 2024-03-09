@@ -19,11 +19,15 @@
 #define LVGL_TASK_MIN_DELAY_MS  (1)
 #define LVGL_TASK_STACK_SIZE    (4 * 1024)
 #define LVGL_TASK_PRIORITY      (2)
-#define LVGL_BUF_HEIGHT         (10)
+#define LVGL_BUF_HEIGHT         (40)
 #define LVGL_BUF_SIZE           (ESP_PANEL_LCD_H_RES * LVGL_BUF_HEIGHT)
 
 ESP_Panel *panel = NULL;
 SemaphoreHandle_t lvgl_mux = NULL; // LVGL mutex
+
+void log_printf(lv_log_level_t level, const char * buf) {
+  Serial.print(buf);
+}
 
 /* Display flushing */
 void lvgl_port_disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *color_p) {
@@ -99,6 +103,7 @@ void setup() {
   assert(ESP_PANEL_LCD_BUS_TYPE == ESP_PANEL_BUS_TYPE_RGB);
   /* Initialize LVGL core */
   lv_init();
+  lv_log_register_print_cb(log_printf);
 
   /* Initialize LVGL buffers */
   /* Using double buffers is more faster than single buffer */
@@ -107,7 +112,7 @@ void setup() {
   assert(buf);
 
   static lv_draw_buf_t draw_buf;
-  lv_draw_buf_init(&draw_buf, ESP_PANEL_LCD_H_RES, LVGL_BUF_HEIGHT, LV_COLOR_FORMAT_RGB565, 0, buf, LVGL_BUF_SIZE);
+  lv_draw_buf_init(&draw_buf, ESP_PANEL_LCD_H_RES, LVGL_BUF_HEIGHT, LV_COLOR_FORMAT_RGB565, 0, buf, LVGL_BUF_SIZE*sizeof(lv_color16_t));
 
   static lv_display_t* display = lv_display_create(ESP_PANEL_LCD_H_RES, ESP_PANEL_LCD_V_RES);
   assert(display);
@@ -161,9 +166,12 @@ void setup() {
   lvgl_port_lock(-1);
   /* Create simple label */
   lv_obj_set_style_bg_color(lv_scr_act(), LV_COLOR_MAKE(0, 0, 255), LV_STATE_DEFAULT);
-  // lv_obj_t *label = lv_label_create(lv_scr_act());
-  // lv_label_set_text(label, LVGL_Arduino.c_str());
-  // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_t *label = lv_label_create(lv_scr_act());
+  lv_label_set_text(label, LVGL_Arduino.c_str());
+  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+  // TODO: why removing this line cause panic?
+  lv_refr_now(display);
   /* Release the mutex */
   lvgl_port_unlock();
 
@@ -182,5 +190,5 @@ void loop() {
     lvgl_port_unlock();
     last_tick = new_tick;
   }
-  delay(1000);
+  delay(100);
 }
