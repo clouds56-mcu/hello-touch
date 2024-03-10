@@ -35,9 +35,8 @@ fn main() {
   };
 
   info!("Hello, world!");
-  for i in 0..40 {
-    let color_data = (0..8000).map(|_| (i as u16).wrapping_mul(38259)).collect::<Vec<_>>();
-    // let color_data = [(i as u16).saturating_mul(38259); 800*10];
+  for i in 0..48 {
+    let color_data = (0..8000).map(|_| (i as u16 / 2).wrapping_mul(38259)).collect::<Vec<_>>();
     info!("{} {}", color_data.len(), color_data[color_data.len() -1]);
     unsafe {
       esp_lcd_panel_draw_bitmap(panel, 0, i*10, 800, (i+1)*10, color_data.as_ptr() as *const _);

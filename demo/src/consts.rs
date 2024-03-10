@@ -12,7 +12,7 @@ pub fn lcd_config() -> esp_lcd_rgb_panel_config_t {
     timings: esp_lcd_rgb_timing_t {
       pclk_hz: 14 * 1000 * 1000,
       h_res: 800,
-      v_res: 400,
+      v_res: 480,
       hsync_pulse_width: 10,
       hsync_back_porch: 10,
       hsync_front_porch: 20,
