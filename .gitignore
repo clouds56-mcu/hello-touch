@@ -2,4 +2,7 @@
 !.vscode/arduino.example.json
 /output
 /target
+/.embuild
 Cargo.lock
+
+*.bak

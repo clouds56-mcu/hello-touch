@@ -4,16 +4,28 @@ version = "0.1.0"
 edition = "2021"
 
 [profile.release]
-debug = true
+opt-level = "s"
+
+[profile.dev]
+debug = true    # Symbols are nice and they don't increase the size on Flash
+opt-level = "z"
+
+[features]
+default = ["alloc", "embassy", "esp-idf-svc/native", "esp-idf-svc/panic_handler", "esp-idf-svc/alloc_handler", "esp-idf-svc/libstart"]
+
+pio = ["esp-idf-svc/pio"]
+std = ["alloc", "esp-idf-svc/binstart", "esp-idf-svc/std"]
+alloc = ["esp-idf-svc/alloc"]
+nightly = ["esp-idf-svc/nightly"]
+experimental = ["esp-idf-svc/experimental"]
+embassy = ["esp-idf-svc/embassy-sync", "esp-idf-svc/critical-section", "esp-idf-svc/embassy-time-driver"]
 
 [dependencies]
-esp-hal = { version = "0.16.0", features = ["esp32s3"] }
-esp-backtrace = { version = "0.11.0", features = ["esp32s3", "panic-handler", "exception-handler", "println"] }
-esp-println = { version = "0.9.0", features = ["esp32s3", "log"] }
-log = { version = "0.4.20" }
-esp-alloc = { version = "0.3.0" }
-# esp-wifi  = { version = "0.3.0", features = ["esp32s3", "wifi"] }
-smoltcp = { version = "0.10.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "socket-tcp", "socket-icmp", "socket-udp", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
-embedded-svc = { version = "0.26.1", default-features = false, features = [] }
-embedded-io = "0.6.1"
-heapless = { version = "0.8.0", default-features = false }
+log = { version = "0.4", default-features = false }
+esp-idf-svc = { version = "0.48", default-features = false }
+
+[build-dependencies]
+embuild = "0.31.3"
+
+[patch.crates-io]
+cc = { git = "https://github.com/rust-lang/cc-rs", tag = "1.0.83" }
